@@ -194,9 +194,13 @@ PHP_METHOD (foundationdb_client, get)
     fdb_wait_check_error(getFuture);
 
     fdb_bool_t valuePresent;
-    const uint8_t *value;
+    const uint8_t *value = NULL;
     int valueLength;
     fdb_check_error(fdb_future_get_value(getFuture, &valuePresent, &value, &valueLength));
+
+    if (value == NULL) {
+        RETURN_NULL();
+    }
 
     RETURN_STRINGL((char *)value, valueLength);
 }
