@@ -70,13 +70,14 @@ void fdb_commit_transaction(foundation_db_object *obj)
 void fdb_keyvalue_array(FDBFuture *get_future, zval *ret_val)
 {
     const FDBKeyValue* out_kv;
-    int out_count;
+    int out_count, index = 0;
+
     fdb_bool_t out_more;
     fdb_check_error(fdb_future_get_keyvalue_array(get_future, &out_kv, &out_count, &out_more));
 
     const FDBKeyValue *kv = out_kv;
 
-    for(int i=0; i<(int)out_count;i++)
+    for(index = 0; index < (int)out_count; index++)
     {
         add_assoc_stringl_ex(ret_val, kv->key, (size_t)kv->key_length, (char *)kv->value, (size_t)kv->value_length);
         kv++;
