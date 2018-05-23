@@ -4,7 +4,11 @@ Check for foundationdb presence
 <?php if (!extension_loaded("foundationdb")) print "skip"; ?>
 --FILE--
 <?php 
-echo "foundationdb extension is available";
+$foundationClient = new \Foundation\Client();
+
+var_dump($foundationClient);
 ?>
 --EXPECT--
-foundationdb extension is available
+object(Foundation\Client)#1 (0) {
+}
+
