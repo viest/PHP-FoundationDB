@@ -3,8 +3,10 @@ Check for foundationdb presence
 --SKIPIF--
 <?php if (!extension_loaded("foundationdb")) print "skip"; ?>
 --FILE--
-<?php 
-$database = $foundation
+<?php
+$foundationClient = new \Foundation\Client();
+
+$database = $foundationClient
     ->connection('/etc/foundationdb/fdb.cluster')
     ->database('DB');
 
