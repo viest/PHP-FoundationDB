@@ -68,7 +68,9 @@ void foundation_db_objects_free(zend_object *object)
 		fdb_transaction_destroy(intern->transaction);
 	}
 
-    fdb_future_destroy(intern->db_future_ptr);
+	if (intern->db_future_ptr != NULL) {
+		fdb_future_destroy(intern->db_future_ptr);
+	}
 
 	zend_object_std_dtor(&intern->zo);
 }

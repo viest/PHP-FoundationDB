@@ -44,6 +44,11 @@ ZEND_BEGIN_ARG_INFO_EX(fdb_range, 0, 0, 2)
 ZEND_END_ARG_INFO()
 /* }}} */
 
+PHP_METHOD (foundationdb_client, __construct)
+{
+
+}
+
 /** {{{ \Foundation\Client::connection()
  */
 PHP_METHOD (foundationdb_client, connection)
@@ -189,9 +194,13 @@ PHP_METHOD (foundationdb_client, get)
     fdb_wait_check_error(getFuture);
 
     fdb_bool_t valuePresent;
-    const uint8_t *value;
+    const uint8_t *value = NULL;
     int valueLength;
     fdb_check_error(fdb_future_get_value(getFuture, &valuePresent, &value, &valueLength));
+
+    if (value == NULL) {
+        RETURN_NULL();
+    }
 
     RETURN_STRINGL((char *)value, valueLength);
 }
@@ -222,12 +231,13 @@ PHP_METHOD (foundationdb_client, clear)
 /** {{{ client_methods
 */
 zend_function_entry client_methods[] = {
-        PHP_ME(foundationdb_client, connection, fdb_connection  , ZEND_ACC_PUBLIC)
-        PHP_ME(foundationdb_client, database,   fdb_database    , ZEND_ACC_PUBLIC)
-        PHP_ME(foundationdb_client, set,        fdb_set         , ZEND_ACC_PUBLIC)
-        PHP_ME(foundationdb_client, range,      fdb_range       , ZEND_ACC_PUBLIC)
-        PHP_ME(foundationdb_client, get,        fdb_get         , ZEND_ACC_PUBLIC)
-        PHP_ME(foundationdb_client, clear,      fdb_clear       , ZEND_ACC_PUBLIC)
+        PHP_ME(foundationdb_client, __construct, NULL            , ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+        PHP_ME(foundationdb_client, connection,  fdb_connection  , ZEND_ACC_PUBLIC)
+        PHP_ME(foundationdb_client, database,    fdb_database    , ZEND_ACC_PUBLIC)
+        PHP_ME(foundationdb_client, set,         fdb_set         , ZEND_ACC_PUBLIC)
+        PHP_ME(foundationdb_client, range,       fdb_range       , ZEND_ACC_PUBLIC)
+        PHP_ME(foundationdb_client, get,         fdb_get         , ZEND_ACC_PUBLIC)
+        PHP_ME(foundationdb_client, clear,       fdb_clear       , ZEND_ACC_PUBLIC)
         PHP_FE_END
 };
 /* }}} */
