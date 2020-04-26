@@ -81,7 +81,9 @@ PHP_GINIT_FUNCTION(foundationdb)
  */
 PHP_GSHUTDOWN_FUNCTION(foundationdb)
 {
-    fdb_future_destroy(foundationdb_globals->cluster_future_ptr);
+    if (foundationdb_globals->cluster_future_ptr != NULL) {
+        fdb_future_destroy(foundationdb_globals->cluster_future_ptr);
+    }
 }
 /* }}} */
 
