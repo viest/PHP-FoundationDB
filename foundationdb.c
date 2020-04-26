@@ -31,6 +31,7 @@
 #include "src/client.h"
 #include "src/exception.h"
 
+ZEND_DECLARE_MODULE_GLOBALS(foundationdb);
 zend_object_handlers foundationdb_handlers;
 
 static zend_always_inline void *vtiful_object_alloc(size_t obj_size, zend_class_entry *ce) {
@@ -60,24 +61,29 @@ void foundation_db_objects_free(zend_object *object)
 {
     foundation_db_object *intern = php_foundation_db_fetch_object(object);
 
-	if (intern->get_future_ptr != NULL) {
-		fdb_future_destroy(intern->get_future_ptr);
-	}
-
-    if (intern->transaction != NULL) {
-		fdb_transaction_destroy(intern->transaction);
-	}
-
-	if (intern->db_future_ptr != NULL) {
-		fdb_future_destroy(intern->db_future_ptr);
-	}
-
 	zend_object_std_dtor(&intern->zo);
 }
 /* }}} */
 
 int le_foundationdb;
 
+/* {{{ PHP_GINIT_FUNCTION
+ */
+PHP_GINIT_FUNCTION(foundationdb)
+{
+    memset(foundationdb_globals, 0, sizeof(zend_foundationdb_globals));
+    foundationdb_globals->network_thread_ptr = NULL;
+    foundationdb_globals->db_future_ptr = NULL;
+}
+/* }}} */
+
+/* {{{ PHP_GINIT_FUNCTION
+ */
+PHP_GSHUTDOWN_FUNCTION(foundationdb)
+{
+    fdb_future_destroy(foundationdb_globals->cluster_future_ptr);
+}
+/* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION
  */
@@ -158,7 +164,11 @@ zend_module_entry foundationdb_module_entry = {
 	PHP_RSHUTDOWN(foundationdb),
 	PHP_MINFO(foundationdb),
 	PHP_FOUNDATIONDB_VERSION,
-	STANDARD_MODULE_PROPERTIES
+    PHP_MODULE_GLOBALS(foundationdb),
+    PHP_GINIT(foundationdb),
+    PHP_GSHUTDOWN(foundationdb),
+    NULL,
+    STANDARD_MODULE_PROPERTIES_EX
 };
 /* }}} */
 

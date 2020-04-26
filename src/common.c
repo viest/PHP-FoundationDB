@@ -47,7 +47,7 @@ void fdb_create_transaction(foundation_db_object *obj)
 {
     FDBDatabase *db;
 
-    fdb_check_error(fdb_future_get_database(obj->db_future_ptr, &db));
+    fdb_check_error(fdb_future_get_database(FOUNDATION_DB_G(db_future_ptr), &db));
     fdb_check_error(fdb_database_create_transaction(db, &obj->transaction));
 }
 /* }}} */
