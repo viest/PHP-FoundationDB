@@ -6,8 +6,14 @@ Check for foundationdb presence
 <?php
 $foundationClient = new \Foundation\Client();
 
+$clusterFile = '/etc/foundationdb/fdb.cluster';
+
+if (PHP_OS === 'Darwin') {
+    $clusterFile = '/usr/local/etc/foundationdb/fdb.cluster';
+}
+
 $database = $foundationClient
-    ->connection('/etc/foundationdb/fdb.cluster')
+    ->connection($clusterFile)
     ->database('DB');
 
 var_dump($foundationClient);
