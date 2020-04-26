@@ -85,7 +85,10 @@ void fdb_keyvalue_array(FDBFuture *get_future, zval *ret_val)
 }
 /* }}} */
 
+/* {{{ php_foundationdb_close
+ * */
 void _php_foundationdb_close(zend_resource *rsrc TSRMLS_DC)
 {
-
+    //
 }
+/* }}} */

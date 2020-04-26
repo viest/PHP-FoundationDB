@@ -22,9 +22,6 @@
 #define PHP_FOUNDATIONDB_H
 
 extern zend_module_entry foundationdb_module_entry;
-#define phpext_foundationdb_ptr &foundationdb_module_entry
-
-#define PHP_FOUNDATIONDB_VERSION "0.1.0" /* Replace with version number for your extension */
 
 #ifdef PHP_WIN32
 #	define PHP_FOUNDATIONDB_API __declspec(dllexport)
@@ -39,6 +36,8 @@ extern zend_module_entry foundationdb_module_entry;
 #endif
 
 #define FDB_API_VERSION 510
+#define PHP_FOUNDATION_DB_VERSION "0.1.0"
+
 #include "foundationdb/fdb_c.h"
 
 typedef struct _foundationdb_object {
@@ -61,19 +60,17 @@ PHP_FOUNDATIONDB_API zend_object *foundation_db_objects_new(zend_class_entry *ce
 void foundation_db_objects_free(zend_object *object);
 void _php_foundationdb_close(zend_resource *rsrc TSRMLS_DC);
 
+#if defined(ZTS) && defined(COMPILE_DL_FOUNDATIONDB)
+ZEND_TSRMLS_CACHE_EXTERN()
+#endif
+
 ZEND_BEGIN_MODULE_GLOBALS(foundationdb)
     FDBFuture *cluster_future_ptr;
     pthread_t *network_thread_ptr;
     FDBFuture *db_future_ptr;
 ZEND_END_MODULE_GLOBALS(foundationdb)
-
-ZEND_EXTERN_MODULE_GLOBALS(foundationdb);
-
-#define FOUNDATION_DB_G(v) (foundationdb_globals.v)
-
-#if defined(ZTS) && defined(COMPILE_DL_FOUNDATIONDB)
-ZEND_TSRMLS_CACHE_EXTERN()
-#endif
+ZEND_EXTERN_MODULE_GLOBALS(foundationdb)
+#define FOUNDATION_DB_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(foundationdb, v)
 
 #endif    /* PHP_FOUNDATIONDB_H */
 
