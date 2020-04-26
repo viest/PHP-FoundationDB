@@ -46,7 +46,7 @@ ZEND_END_ARG_INFO()
 
 PHP_METHOD (foundationdb_client, __construct)
 {
-
+    //
 }
 
 /** {{{ \Foundation\Client::connection()
@@ -61,6 +61,12 @@ PHP_METHOD (foundationdb_client, connection)
 
     ZVAL_COPY(return_value, getThis());
 
+    pthread_t *pthread = FOUNDATION_DB_G(network_thread_ptr);
+
+    if (pthread != NULL) {
+        return;
+    }
+
     fdb_check_error(fdb_select_api_version(FDB_API_VERSION));
     fdb_check_error(fdb_setup_network());
 
@@ -72,7 +78,8 @@ PHP_METHOD (foundationdb_client, connection)
 
     foundation_db_object *obj = Z_FOUNDATION_DB_P(getThis());
 
-    obj->cluster_future_ptr = clusterFuture;
+    FOUNDATION_DB_G(cluster_future_ptr) = clusterFuture;
+    FOUNDATION_DB_G(network_thread_ptr) = &netThread;
 }
 /* }}} */
 
@@ -84,22 +91,19 @@ PHP_METHOD (foundationdb_client, database)
 
     FDBCluster *cluster;
     FDBFuture *dbFuture;
+    FDBFuture *f;
 
     ZEND_PARSE_PARAMETERS_START(1, 1)
             Z_PARAM_STR(database_name)
     ZEND_PARSE_PARAMETERS_END();
 
-    foundation_db_object *obj = Z_FOUNDATION_DB_P(getThis());
-
-    fdb_check_error(fdb_future_get_cluster(obj->cluster_future_ptr, &cluster));
-
-    fdb_future_destroy(obj->cluster_future_ptr);
+    fdb_check_error(fdb_future_get_cluster(FOUNDATION_DB_G(cluster_future_ptr), &cluster));
 
     dbFuture = fdb_cluster_create_database(cluster, (uint8_t *)ZSTR_VAL(database_name), (int)ZSTR_LEN(database_name));
 
     fdb_wait_check_error(dbFuture);
 
-    obj->db_future_ptr = dbFuture;
+    FOUNDATION_DB_G(db_future_ptr) = dbFuture;
 
     ZVAL_COPY(return_value, getThis());
 }

@@ -47,7 +47,7 @@ void fdb_create_transaction(foundation_db_object *obj)
 {
     FDBDatabase *db;
 
-    fdb_check_error(fdb_future_get_database(obj->db_future_ptr, &db));
+    fdb_check_error(fdb_future_get_database(FOUNDATION_DB_G(db_future_ptr), &db));
     fdb_check_error(fdb_database_create_transaction(db, &obj->transaction));
 }
 /* }}} */
@@ -85,7 +85,10 @@ void fdb_keyvalue_array(FDBFuture *get_future, zval *ret_val)
 }
 /* }}} */
 
+/* {{{ php_foundationdb_close
+ * */
 void _php_foundationdb_close(zend_resource *rsrc TSRMLS_DC)
 {
-
+    //
 }
+/* }}} */

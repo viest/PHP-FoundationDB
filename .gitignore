@@ -2,6 +2,7 @@
 *.lo
 *.la
 .libs
+debug.php
 acinclude.m4
 aclocal.m4
 autom4te.cache

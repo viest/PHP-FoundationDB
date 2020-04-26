@@ -7,10 +7,20 @@ compiler:
 os:
   - linux
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
+matrix:
+  include:
+    - php: 7.0
+      env: USE_VALGRIND=1
+    - php: 7.1
+      env: USE_VALGRIND=1
+    - php: 7.2
+      env: USE_VALGRIND=1
+    - php: 7.3
+    - php: 7.4
+
+addons:
+  apt:
+    packages: valgrind
 
 notifications:
   email: dev@service.viest.me
@@ -27,5 +37,9 @@ branches:
   only:
     - master
     - develop
+
 script:
     - ./travis/run-test.sh
+    - make clean && phpize --clean
+    - phpize && ./configure && make clean && make
+    - if [ -n "$USE_VALGRIND" ]; then REPORT_EXIT_STATUS=1 php -n run-tests.php -m -n -d extension_dir=./modules/ -d extension=foundationdb.so -P --show-diff --set-timeout 120; fi
