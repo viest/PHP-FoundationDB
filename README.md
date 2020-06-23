@@ -134,6 +134,30 @@ class Future
     }
 
     /**
+     * Cancel
+     *
+     * @return self
+     *
+     * @author viest
+     */
+    public function cancel()
+    {
+        //
+    }
+
+    /**
+     * Destroy
+     *
+     * @return self
+     *
+     * @author viest
+     */
+    public function destroy()
+    {
+        //
+    }
+
+    /**
      * Block until ready
      *
      * @return $this
@@ -141,6 +165,18 @@ class Future
      * @author viest
      */
     public function blockUntilReady()
+    {
+        //
+    }
+
+    /**
+     * Is ready
+     *
+     * @return bool
+     *
+     * @author viest
+     */
+    public function isReady()
     {
         //
     }

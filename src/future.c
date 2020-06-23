@@ -73,10 +73,19 @@ static void foundation_db_future_objects_free(zend_object *object)
 
 /* {{{ ARG_INFO
  */
+ZEND_BEGIN_ARG_INFO_EX(fdb_arg_future_cancel, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(fdb_arg_future_destroy, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(fdb_arg_future_consturct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(fdb_arg_future_block_until_ready, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(fdb_arg_future_is_ready, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(fdb_arg_future_get_value, 0, 0, 0)
@@ -94,15 +103,58 @@ PHP_METHOD (foundation_db_future, __construct)
 }
 /* }}} */
 
+/** {{{ \Foundation\Future::cancel()
+ */
+PHP_METHOD (foundation_db_future, cancel)
+{
+    fdb_future_object *object = FDB_FUTURE_THIS_OBJECT();
+
+    FDB_FUTURE_IS_NULL_RETURN(object);
+
+    fdb_future_cancel(object->future);
+
+    RETURN_SELF;
+}
+/* }}} */
+
+/** {{{ \Foundation\Future::destroy()
+ */
+PHP_METHOD (foundation_db_future, destroy)
+{
+    fdb_future_object *object = FDB_FUTURE_THIS_OBJECT();
+
+    FDB_FUTURE_IS_NULL_RETURN(object);
+
+    fdb_future_destroy(object->future);
+    object->future = NULL;
+
+    RETURN_SELF;
+}
+/* }}} */
+
 /** {{{ \Foundation\Future::blockUntilReady()
  */
 PHP_METHOD (foundation_db_future, blockUntilReady)
 {
     fdb_future_object *object = FDB_FUTURE_THIS_OBJECT();
 
+    FDB_FUTURE_IS_NULL_RETURN(object);
+
     fdb_check_error(fdb_future_block_until_ready(object->future));
 
     RETURN_SELF;
+}
+/* }}} */
+
+/** {{{ \Foundation\Future::isReady()
+ */
+PHP_METHOD (foundation_db_future, isReady)
+{
+    fdb_future_object *object = FDB_FUTURE_THIS_OBJECT();
+
+    FDB_FUTURE_IS_NULL_RETURN(object);
+
+    RETURN_BOOL(fdb_future_is_ready(object->future));
 }
 /* }}} */
 
@@ -111,6 +163,8 @@ PHP_METHOD (foundation_db_future, blockUntilReady)
 PHP_METHOD (foundation_db_future, getValue)
 {
     fdb_future_object *object = FDB_FUTURE_THIS_OBJECT();
+
+    FDB_FUTURE_IS_NULL_RETURN(object);
 
     int valueLength;
     fdb_bool_t valuePresent;
@@ -132,6 +186,8 @@ PHP_METHOD (foundation_db_future, getError)
 {
     fdb_future_object *object = FDB_FUTURE_THIS_OBJECT();
 
+    FDB_FUTURE_IS_NULL_RETURN(object);
+
     fdb_check_error(fdb_future_get_error(object->future));
 
     RETURN_NULL();
@@ -142,7 +198,10 @@ PHP_METHOD (foundation_db_future, getError)
  */
 zend_function_entry future_methods[] = {
         PHP_ME(foundation_db_future, __construct,     fdb_arg_future_consturct,         ZEND_ACC_PUBLIC)
+        PHP_ME(foundation_db_future, cancel,          fdb_arg_future_cancel,            ZEND_ACC_PUBLIC)
+        PHP_ME(foundation_db_future, destroy,         fdb_arg_future_destroy,           ZEND_ACC_PUBLIC)
         PHP_ME(foundation_db_future, blockUntilReady, fdb_arg_future_block_until_ready, ZEND_ACC_PUBLIC)
+        PHP_ME(foundation_db_future, isReady,         fdb_arg_future_is_ready,          ZEND_ACC_PUBLIC)
         PHP_ME(foundation_db_future, getValue,        fdb_arg_future_get_value,         ZEND_ACC_PUBLIC)
         PHP_ME(foundation_db_future, getError,        fdb_arg_future_get_error,         ZEND_ACC_PUBLIC)
         PHP_FE_END
