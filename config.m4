@@ -8,6 +8,16 @@ LIB_MIN_MAJOR=0
 LIBFDBC_MIN_MINOR=28
 
 if test "$PHP_FOUNDATIONDB" != "no"; then
+  foundation_db_sources="
+    foundationdb.c \
+    src/api_version.c \
+    src/common.c \
+    src/database.c \
+    src/exception.c \
+    src/future.c \
+    src/network.c \
+    src/transaction.c
+    "
 
   LIBNAME="fdb_c"
   LIBSYMBOL="fdb_setup_network"
@@ -43,7 +53,10 @@ if test "$PHP_FOUNDATIONDB" != "no"; then
 
   PHP_SUBST(FOUNDATIONDB_SHARED_LIBADD)
 
-  PHP_NEW_EXTENSION(foundationdb, foundationdb.c src/common.c src/client.c src/exception.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+  PHP_NEW_EXTENSION(foundationdb, $foundation_db_sources, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+
+  PHP_ADD_INCLUDE([$srcdir])
+  PHP_ADD_INCLUDE([$srcdir/include])
 
   PHP_ADD_BUILD_DIR([$ext_builddir/src])
 fi

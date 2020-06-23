@@ -25,11 +25,8 @@
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/info.h"
-#include "php_foundationdb.h"
 
-#include "src/common.h"
-#include "src/client.h"
-#include "src/exception.h"
+#include "foundation.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(foundationdb);
 zend_object_handlers foundationdb_handlers;
@@ -78,7 +75,7 @@ PHP_GINIT_FUNCTION(foundationdb)
 {
     memset(foundationdb_globals, 0, sizeof(zend_foundationdb_globals));
 
-    foundationdb_globals->db_future_ptr = NULL;
+    foundationdb_globals->db_future_ptr      = NULL;
     foundationdb_globals->cluster_future_ptr = NULL;
     foundationdb_globals->network_thread_ptr = NULL;
 }
@@ -102,10 +99,16 @@ PHP_GSHUTDOWN_FUNCTION(foundationdb)
  */
 PHP_MINIT_FUNCTION(foundationdb)
 {
-    FOUNDATIONDB_STARTUP_MODULE(foundation_client);
-    FOUNDATIONDB_STARTUP_MODULE(foundation_exception);
+    FOUNDATION_DB_STARTUP_MODULE(foundation_exception);
+    FOUNDATION_DB_STARTUP_MODULE(foundation_network);
+    FOUNDATION_DB_STARTUP_MODULE(foundation_api_version);
+    FOUNDATION_DB_STARTUP_MODULE(foundation_database);
+    FOUNDATION_DB_STARTUP_MODULE(foundation_transaction);
+    FOUNDATION_DB_STARTUP_MODULE(foundation_future);
 
-    le_foundationdb = zend_register_list_destructors_ex(_php_foundationdb_close, NULL, FOUNDATION_DB_RESOURCE_NAME, module_number);
+//    FOUNDATIONDB_STARTUP_MODULE(foundation_client);
+
+    le_foundationdb = zend_register_list_destructors_ex(_php_foundation_db_close, NULL, FOUNDATION_DB_RESOURCE_NAME, module_number);
 
 	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
@@ -160,7 +163,7 @@ PHP_MINFO_FUNCTION(foundationdb)
  *
  * Every user visible function must have an entry in foundationdb_functions[].
  */
-const zend_function_entry foundationdb_functions[] = {
+const zend_function_entry foundation_db_functions[] = {
 	PHP_FE_END
 };
 /* }}} */
@@ -170,7 +173,7 @@ const zend_function_entry foundationdb_functions[] = {
 zend_module_entry foundationdb_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"foundationdb",
-	foundationdb_functions,
+    foundation_db_functions,
 	PHP_MINIT(foundationdb),
 	PHP_MSHUTDOWN(foundationdb),
 	PHP_RINIT(foundationdb),
